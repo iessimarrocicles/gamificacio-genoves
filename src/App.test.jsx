@@ -79,6 +79,33 @@ describe('pantalla del mestre/a', () => {
     expect(guardat().alumnes[0].record).toBe(2);
   });
 
+  it('a Configuració es poden afegir propostes del trinquet i posar −2 a una de millora', async () => {
+    const usuari = userEvent.setup();
+    guardaClasse('Aitana');
+    render(<App />);
+
+    await usuari.click(screen.getByRole('button', { name: 'Configuració' }));
+    await usuari.click(screen.getByRole('tab', { name: 'Categories' }));
+
+    await usuari.selectOptions(screen.getByRole('combobox', { name: 'Afig una categoria que suma' }), 'rest-ferro');
+    await usuari.click(screen.getAllByRole('button', { name: 'Afig' })[0]);
+    expect(guardat().categories.find((c) => c.id === 'rest-ferro')).toMatchObject({ valor: 2, tipus: 'positiu' });
+
+    await usuari.selectOptions(screen.getByRole('combobox', { name: 'Afig un aspecte a millorar' }), 'sense-didals');
+    await usuari.click(screen.getAllByRole('button', { name: 'Afig' })[1]);
+    expect(guardat().categories.find((c) => c.id === 'sense-didals')).toMatchObject({ tipus: 'millora' });
+
+    const galeria = screen.getByRole('group', { name: 'Quinzes de Pilota a la galeria' });
+    await usuari.click(within(galeria).getByRole('button', { name: 'Més quinzes' }));
+    expect(within(galeria).getByText('−2')).toBeInTheDocument();
+    expect(guardat().categories.find((c) => c.id === 'pilota-galeria').valor).toBe(2);
+
+    await usuari.click(screen.getByRole('button', { name: 'Tanca' }));
+    await usuari.click(targeta('Aitana'));
+    await usuari.click(screen.getByRole('button', { name: /Pilota a la galeria/ }));
+    expect(screen.getByRole('button', { name: '−2 quinzes' })).toBeInTheDocument();
+  });
+
   it('en mode alumnat, tocar el nom obri el pilotari i no deixa donar quinzes', async () => {
     const usuari = userEvent.setup();
     guardaClasse('Aitana');

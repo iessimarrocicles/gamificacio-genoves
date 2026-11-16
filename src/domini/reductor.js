@@ -217,8 +217,17 @@ export function reductor(estat, accio) {
     case 'ABSENTS_NETEJAR':
       return { ...estat, alumnes: estat.alumnes.map((a) => (a.absent ? { ...a, absent: false } : a)) };
 
-    case 'CATEGORIA_AFEGIR':
-      return { ...estat, categories: [...estat.categories, netejaCategoria(accio.categoria)] };
+    case 'CATEGORIA_AFEGIR': {
+      const nova = netejaCategoria(accio.categoria);
+      // Si ja existeix (arxivada o no), es recupera en compte de duplicar l'id.
+      if (estat.categories.some((c) => c.id === nova.id)) {
+        return {
+          ...estat,
+          categories: estat.categories.map((c) => (c.id === nova.id ? { ...nova, arxivada: false } : c)),
+        };
+      }
+      return { ...estat, categories: [...estat.categories, nova] };
+    }
 
     case 'CATEGORIA_EDITAR':
       return {

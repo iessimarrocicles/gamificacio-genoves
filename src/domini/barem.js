@@ -60,6 +60,34 @@ export const CATEGORIES_INICIALS = [
   },
 ];
 
+// Propostes amb vocabulari de pilota per al desplegable de Configuració → Categories.
+// Inclouen les de l'enunciat (per si s'esborren i es volen recuperar) i moltes més.
+export const CATEGORIES_TRINQUET = [
+  ...CATEGORIES_INICIALS,
+
+  // Sumen quinzes
+  { id: 'bon-marxador', nom: 'Bon marxador', icona: '🎒', valor: 1, tipus: 'positiu', descripcio: 'Portar el material i l’agenda a punt, com qui porta el compte de la partida.' },
+  { id: 'canxa-neta', nom: 'Canxa neta', icona: '🧹', valor: 1, tipus: 'positiu', descripcio: 'Deixar la taula i l’aula ben endreçades.' },
+  { id: 'galeria-animada', nom: 'Galeria animada', icona: '👏', valor: 1, tipus: 'positiu', descripcio: 'Animar i felicitar els companys i companyes.' },
+  { id: 'bona-volea', nom: 'Bona volea', icona: '🙋', valor: 1, tipus: 'positiu', descripcio: 'Participar i respondre bé quan toca.' },
+  { id: 'partida-casa', nom: 'Partida a casa', icona: '🏠', valor: 1, tipus: 'positiu', descripcio: 'Portar fets els deures de casa.' },
+  { id: 'lectura-trinquet', nom: 'Veu de trinquet', icona: '📖', valor: 1, tipus: 'positiu', descripcio: 'Llegir en veu alta amb bona entonació.' },
+  { id: 'a-punt-traure', nom: 'A punt per a traure', icona: '⏰', valor: 1, tipus: 'positiu', descripcio: 'Arribar puntual i començar la tasca de seguida.' },
+  { id: 'tanto-mitger', nom: 'Tanto de mitger', icona: '🤲', valor: 2, tipus: 'positiu', descripcio: 'Ajudar un company/a a entendre la tasca.' },
+  { id: 'rest-ferro', nom: 'Rest de ferro', icona: '💪', valor: 2, tipus: 'positiu', descripcio: 'Mantindre l’esforç tota la sessió sense rendir-se.' },
+  { id: 'quinze-dau', nom: 'Quinze al dau', icona: '🎯', valor: 2, tipus: 'positiu', descripcio: 'Fer una tasca extra o voluntària.' },
+  { id: 'paret-escala', nom: 'Pilota a l’escala', icona: '🪜', valor: 2, tipus: 'positiu', descripcio: 'Millorar molt respecte a l’última vegada.' },
+  { id: 'jugada-mestra', nom: 'Jugada mestra', icona: '🏆', valor: 3, tipus: 'positiu', descripcio: 'Un treball excel·lent que mereix un aplaudiment.' },
+
+  // Per a millorar
+  { id: 'pilota-corda', nom: 'Pilota baix la corda', icona: '🪢', valor: 1, tipus: 'millora', descripcio: 'No acabar la tasca que tocava.' },
+  { id: 'sense-didals', nom: 'Sense didals', icona: '🧤', valor: 1, tipus: 'millora', descripcio: 'Oblidar el material o l’agenda.' },
+  { id: 'canxa-bruta', nom: 'Canxa bruta', icona: '🗑️', valor: 1, tipus: 'millora', descripcio: 'Deixar la taula o l’aula desordenades.' },
+  { id: 'fora-trinquet', nom: 'Fora del trinquet', icona: '🚪', valor: 1, tipus: 'millora', descripcio: 'Alçar-se o eixir del lloc sense permís.' },
+  { id: 'tard-partida', nom: 'Tard a la partida', icona: '🐌', valor: 1, tipus: 'millora', descripcio: 'Arribar tard o tardar molt a començar.' },
+  { id: 'joc-brut', nom: 'Joc brut', icona: '🟨', valor: 2, tipus: 'millora', descripcio: 'Faltar al respecte a un company/a.' },
+];
+
 // El nivell depén del rècord (màxim de quinzes assolit), de manera que mai es perd.
 export const NIVELLS = [
   { numero: 1, nom: 'Aficionat/da', minim: 0, lema: 'Tot gran pilotari va començar mirant des de l’escala.' },

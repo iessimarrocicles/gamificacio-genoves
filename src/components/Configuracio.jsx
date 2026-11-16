@@ -3,7 +3,8 @@ import Finestra from './Finestra.jsx';
 import AvatarPilotari from './AvatarPilotari.jsx';
 import { useClasse } from '../estat/ClasseContext.jsx';
 import { crearAlumne, nouId } from '../domini/reductor.js';
-import { PREMIS_SUGGERITS } from '../domini/barem.js';
+import { PREMIS_SUGGERITS, CATEGORIES_TRINQUET } from '../domini/barem.js';
+import { suggerimentsDisponibles } from '../domini/suggeriments.js';
 import { LIMITS_PARTIDA, estatPartida } from '../domini/partida.js';
 import { aCopia, deCopia, baixaFitxer, dataPerAFitxer } from '../dades/copia.js';
 import { hiHaVeu } from '../so/so.js';
@@ -16,7 +17,10 @@ const PESTANYES = [
   { id: 'dades', nom: 'Dades' },
 ];
 
-const ICONES = ['🤚', '🤝', '👀', '👥', '⚡', '📖', '✏️', '🧹', '🎨', '🔢', '🗣️', '🌱', '⭐', '💭', '📣', '⏰', '🏃'];
+// Icones de les propostes del trinquet i unes quantes més de classe.
+const ICONES = [
+  ...new Set([...CATEGORIES_TRINQUET.map((c) => c.icona), '✏️', '🎨', '🔢', '🗣️', '🌱', '⭐', '🏃']),
+];
 
 const camp = 'min-h-12 w-full rounded-xl border-[3px] border-llosa-200 bg-white px-3 text-lg focus:border-blau-500 focus:outline-none';
 const botoPrimari = 'min-h-12 rounded-xl bg-blau-600 px-5 text-lg font-semibold text-white hover:bg-blau-700 disabled:opacity-40';
@@ -156,19 +160,18 @@ function FilaCategoria({ categoria }) {
           maxLength={30}
           onBlur={(e) => edita({ nom: e.target.value })}
         />
-        {esMillora ? (
-          <span className="rounded-xl bg-ambre-100 px-3 py-2 text-base font-semibold text-ambre-700">Avís o −1</span>
-        ) : (
-          <div className="flex items-center gap-1.5" role="group" aria-label={`Quinzes de ${categoria.nom}`}>
-            <button type="button" className={`${botoSecundari} w-12 px-0`} onClick={() => edita({ valor: categoria.valor - 1 })} disabled={categoria.valor <= 1} aria-label="Menys">
-              −
-            </button>
-            <span className="xifres w-14 text-center font-display text-2xl">+{categoria.valor}</span>
-            <button type="button" className={`${botoSecundari} w-12 px-0`} onClick={() => edita({ valor: categoria.valor + 1 })} disabled={categoria.valor >= 5} aria-label="Més">
-              +
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-1.5" role="group" aria-label={`Quinzes de ${categoria.nom}`}>
+          <button type="button" className={`${botoSecundari} w-12 px-0`} onClick={() => edita({ valor: categoria.valor - 1 })} disabled={categoria.valor <= 1} aria-label="Menys quinzes">
+            −
+          </button>
+          <span className={`xifres w-14 text-center font-display text-2xl ${esMillora ? 'text-llosa-700' : ''}`}>
+            {esMillora ? '−' : '+'}
+            {categoria.valor}
+          </span>
+          <button type="button" className={`${botoSecundari} w-12 px-0`} onClick={() => edita({ valor: categoria.valor + 1 })} disabled={categoria.valor >= 5} aria-label="Més quinzes">
+            +
+          </button>
+        </div>
         <BotoConfirma pregunta="Esborrar-la?" onConfirma={() => dispatch({ type: 'CATEGORIA_ELIMINAR', id: categoria.id })}>
           Esborra
         </BotoConfirma>
@@ -185,27 +188,68 @@ function FilaCategoria({ categoria }) {
   );
 }
 
-function Categories() {
+const EN_BLANC = '__en-blanc__';
+
+/** Desplegable amb propostes del trinquet per a afegir una categoria (o una en blanc). */
+function AfigCategoria({ tipus, etiqueta }) {
   const { estat, dispatch } = useClasse();
+  const [triada, setTriada] = useState('');
+  const propostes = suggerimentsDisponibles(estat.categories, tipus);
+  const signe = tipus === 'millora' ? '−' : '+';
+
+  const afig = () => {
+    const proposta = propostes.find((c) => c.id === triada);
+    const categoria = proposta
+      ? { ...proposta }
+      : {
+          id: nouId('cat'),
+          nom: tipus === 'positiu' ? 'Categoria nova' : 'Aspecte a millorar',
+          icona: tipus === 'positiu' ? '⭐' : '💭',
+          valor: 1,
+          tipus,
+          descripcio: '',
+        };
+    dispatch({ type: 'CATEGORIA_AFEGIR', categoria });
+    setTriada('');
+  };
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      <select
+        className={`${camp.replace('w-full ', '')} min-w-64 flex-1`}
+        value={triada}
+        onChange={(e) => setTriada(e.target.value)}
+        aria-label={etiqueta}
+      >
+        <option value="">{etiqueta}…</option>
+        {propostes.length > 0 && (
+          <optgroup label="Propostes del trinquet">
+            {propostes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.icona} {c.nom} ({signe}
+                {c.valor}): {c.descripcio}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        <option value={EN_BLANC}>✏️ Una de nova, en blanc</option>
+      </select>
+      <button type="button" className={botoPrimari} disabled={!triada} onClick={afig}>
+        Afig
+      </button>
+    </div>
+  );
+}
+
+function Categories() {
+  const { estat } = useClasse();
   const actives = estat.categories.filter((c) => !c.arxivada);
-  const afig = (tipus) =>
-    dispatch({
-      type: 'CATEGORIA_AFEGIR',
-      categoria: {
-        id: nouId('cat'),
-        nom: tipus === 'positiu' ? 'Categoria nova' : 'Aspecte a millorar',
-        icona: tipus === 'positiu' ? '⭐' : '💭',
-        valor: 1,
-        tipus,
-        descripcio: '',
-      },
-    });
 
   return (
     <div className="space-y-6">
       {[
-        { tipus: 'positiu', titol: 'Sumen quinzes', boto: 'Afig una categoria que suma' },
-        { tipus: 'millora', titol: 'Per a millorar (avís o −1)', boto: 'Afig un aspecte a millorar' },
+        { tipus: 'positiu', titol: 'Sumen quinzes', etiqueta: 'Afig una categoria que suma' },
+        { tipus: 'millora', titol: 'Per a millorar (avís o restar quinzes)', etiqueta: 'Afig un aspecte a millorar' },
       ].map((grup) => (
         <div key={grup.tipus}>
           <h3 className="mb-2 text-lg font-semibold">{grup.titol}</h3>
@@ -214,9 +258,7 @@ function Categories() {
               <FilaCategoria key={c.id} categoria={c} />
             ))}
           </ul>
-          <button type="button" className={`${botoSecundari} mt-2`} onClick={() => afig(grup.tipus)}>
-            {grup.boto}
-          </button>
+          <AfigCategoria tipus={grup.tipus} etiqueta={grup.etiqueta} />
         </div>
       ))}
     </div>

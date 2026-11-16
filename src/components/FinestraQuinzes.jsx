@@ -104,7 +104,7 @@ export default function FinestraQuinzes({ alumneIds, titol, onTanca, onVeuPilota
       {deMillora.length > 0 && (
         <>
           <h3 className="mb-1 mt-7 text-xl font-semibold">Per a millorar</h3>
-          <p className="mb-3 text-base text-llosa-500">Tria si és només un avís o si es resta un quinze.</p>
+          <p className="mb-3 text-base text-llosa-500">Tria si és només un avís o si es resten quinzes.</p>
           <div className="grid gap-3 sm:grid-cols-2">
             {deMillora.map((c) => (
               <div key={c.id} className="rounded-2xl border-[3px] border-llosa-200 bg-white">
@@ -118,6 +118,9 @@ export default function FinestraQuinzes({ alumneIds, titol, onTanca, onVeuPilota
                   <span className="min-w-0 flex-1">
                     <span className="block text-xl font-semibold leading-tight">{c.nom}</span>
                     <span className="block text-base leading-snug text-llosa-700">{c.descripcio}</span>
+                  </span>
+                  <span className="grid size-14 shrink-0 place-items-center rounded-full bg-llosa-100 font-display text-2xl text-llosa-700">
+                    −{c.valor}
                   </span>
                 </button>
                 {millora === c.id && (
@@ -134,7 +137,7 @@ export default function FinestraQuinzes({ alumneIds, titol, onTanca, onVeuPilota
                       onClick={() => dona(c.id, 'resta')}
                       className="min-h-14 flex-1 rounded-xl bg-llosa-700 px-3 text-lg font-semibold text-white hover:bg-llosa-900"
                     >
-                      −1 quinze
+                      −{quinzes(c.valor)}
                     </button>
                   </div>
                 )}

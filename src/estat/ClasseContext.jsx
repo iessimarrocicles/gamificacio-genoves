@@ -77,7 +77,7 @@ export function ClasseProvider({ children, repositori }) {
           ? `${categoria.nom}: +${categoria.valor} per a ${aQui}`
           : esAvis
             ? `Avís de «${categoria.nom}» per a ${aQui}`
-            : `${categoria.nom}: −1 per a ${aQui}`,
+            : `${categoria.nom}: −${categoria.valor} per a ${aQui}`,
         frase,
       });
 
