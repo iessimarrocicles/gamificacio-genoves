@@ -1,5 +1,6 @@
 import { CATEGORIES_INICIALS, OPCIONS_AVATAR } from './barem.js';
 import { PARTIDA_INICIAL, LIMITS_PARTIDA, objectiuPartida } from './partida.js';
+import { colorValid } from './grups.js';
 
 export const VERSIO_DADES = 1;
 
@@ -15,6 +16,7 @@ export function estatInicial() {
     categories: CATEGORIES_INICIALS.map((c) => ({ ...c })),
     esdeveniments: [],
     partida: { ...PARTIDA_INICIAL },
+    grups: [],
     config: { so: true, veu: false },
   };
 }
@@ -60,7 +62,17 @@ function netejaCategoria(c) {
   };
 }
 
-function netejaPartida(p) {
+function netejaGrup(g, alumnes) {
+  const existeixen = new Set(alumnes.map((a) => a.id));
+  return {
+    id: g.id,
+    nom: String(g.nom ?? '').trim() || 'Grup',
+    color: colorValid(g.color),
+    alumneIds: [...new Set(Array.isArray(g.alumneIds) ? g.alumneIds : [])].filter((id) => existeixen.has(id)),
+  };
+}
+
+export function netejaPartida(p) {
   const { quinzesPerJoc: lq, jocsObjectiu: lj } = LIMITS_PARTIDA;
   const partida = {
     ...PARTIDA_INICIAL,
@@ -78,35 +90,37 @@ function netejaPartida(p) {
 export function normalitzaEstat(guardat) {
   const base = estatInicial();
   if (!guardat || typeof guardat !== 'object') return base;
+  const alumnes = Array.isArray(guardat.alumnes)
+    ? guardat.alumnes
+        .filter((a) => a && a.id && a.nom)
+        .map((a, i) => {
+          const model = crearAlumne(a.nom, i, a.id);
+          const quinzes = Math.max(0, Number(a.quinzes) || 0);
+          return {
+            ...model,
+            avatar: { ...model.avatar, ...(a.avatar ?? {}) },
+            quinzes,
+            record: Math.max(quinzes, Number(a.record) || 0),
+            absent: Boolean(a.absent),
+          };
+        })
+    : base.alumnes;
   return {
     versio: VERSIO_DADES,
     aula: { ...base.aula, ...(guardat.aula ?? {}) },
-    alumnes: Array.isArray(guardat.alumnes)
-      ? guardat.alumnes
-          .filter((a) => a && a.id && a.nom)
-          .map((a, i) => {
-            const model = crearAlumne(a.nom, i, a.id);
-            const quinzes = Math.max(0, Number(a.quinzes) || 0);
-            return {
-              ...model,
-              avatar: { ...model.avatar, ...(a.avatar ?? {}) },
-              quinzes,
-              record: Math.max(quinzes, Number(a.record) || 0),
-              absent: Boolean(a.absent),
-            };
-          })
-      : base.alumnes,
+    alumnes,
     categories:
       Array.isArray(guardat.categories) && guardat.categories.length > 0
         ? guardat.categories.filter((c) => c && c.id).map(netejaCategoria)
         : base.categories,
     esdeveniments: Array.isArray(guardat.esdeveniments) ? guardat.esdeveniments.slice(-MAX_ESDEVENIMENTS) : [],
     partida: netejaPartida(guardat.partida ?? {}),
+    grups: Array.isArray(guardat.grups) ? guardat.grups.filter((g) => g && g.id).map((g) => netejaGrup(g, alumnes)) : [],
     config: { ...base.config, ...(guardat.config ?? {}) },
   };
 }
 
-function atorgar(estat, { alumneIds, categoriaId, mode = 'quinze', lot, data }) {
+function atorgar(estat, { alumneIds, categoriaId, mode = 'quinze', lot, data, grupId }) {
   const categoria = estat.categories.find((c) => c.id === categoriaId);
   const ids = new Set(alumneIds);
   if (!categoria || !estat.alumnes.some((a) => ids.has(a.id))) return estat;
@@ -144,6 +158,7 @@ function atorgar(estat, { alumneIds, categoriaId, mode = 'quinze', lot, data }) 
       tipus,
       partida: aLaPartida,
       recordAbans: a.record,
+      ...(grupId ? { grupId } : {}),
     });
     return valor === 0 ? a : { ...a, quinzes, record };
   });
@@ -206,6 +221,9 @@ export function reductor(estat, accio) {
         ...estat,
         alumnes: estat.alumnes.filter((a) => a.id !== accio.id),
         esdeveniments: estat.esdeveniments.filter((ev) => ev.alumneId !== accio.id),
+        grups: estat.grups.map((g) =>
+          g.alumneIds.includes(accio.id) ? { ...g, alumneIds: g.alumneIds.filter((id) => id !== accio.id) } : g,
+        ),
       };
 
     case 'ALUMNE_ABSENT':
@@ -246,6 +264,33 @@ export function reductor(estat, accio) {
           : estat.categories.filter((c) => c.id !== accio.id),
       };
     }
+
+    case 'GRUP_AFEGIR':
+      return { ...estat, grups: [...estat.grups, netejaGrup(accio.grup, estat.alumnes)] };
+
+    case 'GRUP_EDITAR':
+      return {
+        ...estat,
+        grups: estat.grups.map((g) =>
+          g.id === accio.id ? netejaGrup({ ...g, ...accio.canvis, id: g.id }, estat.alumnes) : g,
+        ),
+      };
+
+    case 'GRUP_ELIMINAR':
+      return { ...estat, grups: estat.grups.filter((g) => g.id !== accio.id) };
+
+    case 'GRUP_MEMBRE':
+      return {
+        ...estat,
+        grups: estat.grups.map((g) => {
+          if (g.id !== accio.id) return g;
+          const sense = g.alumneIds.filter((id) => id !== accio.alumneId);
+          return netejaGrup({ ...g, alumneIds: accio.dins ? [...sense, accio.alumneId] : sense }, estat.alumnes);
+        }),
+      };
+
+    case 'GRUPS_SUBSTITUIR':
+      return { ...estat, grups: accio.grups.map((g) => netejaGrup(g, estat.alumnes)) };
 
     case 'PARTIDA_CONFIG':
       return { ...estat, partida: netejaPartida({ ...estat.partida, ...accio.canvis }) };

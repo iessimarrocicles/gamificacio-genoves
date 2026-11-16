@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import Finestra from './Finestra.jsx';
 import AvatarPilotari from './AvatarPilotari.jsx';
+import { Pagina, botoSecundari as boto } from './comuns.jsx';
 import { useClasse } from '../estat/ClasseContext.jsx';
-import { PERIODES, resumGrup, resumAlumne, evolucioDiaria } from '../domini/informes.js';
+import { PERIODES, resumGrup, resumGrups, resumAlumne, evolucioDiaria } from '../domini/informes.js';
+import { COLORS_GRUP } from '../domini/grups.js';
 import { estatPartida } from '../domini/partida.js';
 import { quinzes } from '../domini/text.js';
 import { aCsv, baixaFitxer, dataPerAFitxer } from '../dades/copia.js';
 
 const DIES = ['dg', 'dl', 'dt', 'dc', 'dj', 'dv', 'ds'];
-const boto = 'min-h-12 rounded-xl border-[3px] border-llosa-300 bg-white px-4 text-lg font-semibold text-llosa-700 hover:bg-llosa-100';
 
 function Xifra({ valor, titol, to = 'bg-white' }) {
   return (
@@ -140,6 +140,78 @@ function Grup({ periode }) {
   );
 }
 
+/** Una fila per grup. Els quinzes són dels membres d'ara: si un grup canvia, l'informe canvia amb ell. */
+function PerGrups({ periode }) {
+  const { estat } = useClasse();
+  const files = resumGrups(estat, periode);
+  const maxim = Math.max(1, ...files.map((f) => f.guanyats));
+
+  if (files.length === 0) {
+    return (
+      <p className="rounded-3xl border-[3px] border-dashed border-llosa-300 bg-white p-8 text-center text-xl text-llosa-700">
+        Esta classe encara no té grups. Es creen a la secció «Grups».
+      </p>
+    );
+  }
+
+  const baixa = () => {
+    const csv = aCsv(
+      ['Grup', 'Membres', 'Quinzes ara', 'Guanyats'],
+      files.map((f) => [f.nom, f.membres, f.quinzes, f.guanyats]),
+    );
+    baixaFitxer(`informe-grups-${dataPerAFitxer()}.csv`, csv, 'text/csv');
+  };
+
+  return (
+    <div>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-lg font-semibold">Grup per grup</h3>
+        <button type="button" className={`${boto} no-imprimir`} onClick={baixa}>
+          Baixa en CSV
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-2xl border-[3px] border-llosa-200 bg-white">
+        <table className="w-full text-left text-lg">
+          <thead className="bg-llosa-100 text-base">
+            <tr>
+              <th className="px-3 py-2 font-semibold">Grup</th>
+              <th className="px-3 py-2 text-right font-semibold">Membres</th>
+              <th className="px-3 py-2 text-right font-semibold">Quinzes ara</th>
+              <th className="px-3 py-2 font-semibold" colSpan={2}>Guanyats en el període</th>
+            </tr>
+          </thead>
+          <tbody>
+            {files.map((f) => (
+              <tr key={f.id} className="border-t-2 border-llosa-100">
+                <th scope="row" className="px-3 py-2 font-semibold">
+                  <span className="flex items-center gap-2">
+                    <span className="size-4 shrink-0 rounded-full" style={{ background: COLORS_GRUP[f.color].fons }} aria-hidden="true" />
+                    {f.nom}
+                  </span>
+                </th>
+                <td className="xifres px-3 py-2 text-right">{f.membres}</td>
+                <td className="xifres px-3 py-2 text-right">{f.quinzes}</td>
+                <td className="xifres w-16 px-3 py-2 text-right font-semibold">{f.guanyats}</td>
+                <td className="w-2/5 py-2 pr-3" aria-hidden="true">
+                  <span className="block h-5 overflow-hidden rounded-full bg-llosa-100">
+                    <span
+                      className="block h-full rounded-full"
+                      style={{ width: `${(f.guanyats / maxim) * 100}%`, background: COLORS_GRUP[f.color].fons }}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-base text-llosa-500">
+        Compten els quinzes dels membres que té cada grup ara, els haja guanyat amb el grup o pel seu compte.
+      </p>
+    </div>
+  );
+}
+
 function Individual({ periode, alumneId, setAlumneId }) {
   const { estat } = useClasse();
   const r = alumneId ? resumAlumne(estat, alumneId, periode) : null;
@@ -212,7 +284,14 @@ function Individual({ periode, alumneId, setAlumneId }) {
   );
 }
 
-export default function Informes({ onTanca }) {
+const VISTES = [
+  { id: 'grup', nom: 'Tota la classe' },
+  { id: 'grups', nom: 'Per grups' },
+  { id: 'alumne', nom: 'Un/a alumne/a' },
+];
+
+/** Pàgina d'informes de la classe activa. */
+export default function Informes() {
   const { estat } = useClasse();
   const [vista, setVista] = useState('grup');
   const [periode, setPeriode] = useState('setmana');
@@ -221,14 +300,13 @@ export default function Informes({ onTanca }) {
     `min-h-12 rounded-full px-5 text-lg font-semibold ${actiu ? 'bg-llosa-900 text-white' : 'bg-white text-llosa-700 hover:bg-llosa-100'}`;
 
   return (
-    <Finestra titol="Informes" onTanca={onTanca} ample="max-w-5xl">
+    <Pagina titol="Informes">
       <div className="no-imprimir mb-5 flex flex-wrap items-center gap-2">
-        <button type="button" className={pastilla(vista === 'grup')} aria-pressed={vista === 'grup'} onClick={() => setVista('grup')}>
-          Tota la classe
-        </button>
-        <button type="button" className={pastilla(vista === 'alumne')} aria-pressed={vista === 'alumne'} onClick={() => setVista('alumne')}>
-          Un/a alumne/a
-        </button>
+        {VISTES.map((v) => (
+          <button key={v.id} type="button" className={pastilla(vista === v.id)} aria-pressed={vista === v.id} onClick={() => setVista(v.id)}>
+            {v.nom}
+          </button>
+        ))}
         <span className="mx-2 hidden h-8 w-0.5 bg-llosa-200 sm:block" aria-hidden="true" />
         {PERIODES.map((p) => (
           <button key={p.id} type="button" className={pastilla(periode === p.id)} aria-pressed={periode === p.id} onClick={() => setPeriode(p.id)}>
@@ -244,12 +322,10 @@ export default function Informes({ onTanca }) {
         <p className="mb-4 text-lg text-llosa-700">
           {estat.aula.nom}, {estat.aula.escola}. {PERIODES.find((p) => p.id === periode).nom}.
         </p>
-        {vista === 'grup' ? (
-          <Grup periode={periode} />
-        ) : (
-          <Individual periode={periode} alumneId={alumneId} setAlumneId={setAlumneId} />
-        )}
+        {vista === 'grup' && <Grup periode={periode} />}
+        {vista === 'grups' && <PerGrups periode={periode} />}
+        {vista === 'alumne' && <Individual periode={periode} alumneId={alumneId} setAlumneId={setAlumneId} />}
       </div>
-    </Finestra>
+    </Pagina>
   );
 }

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { crearRepositoriLocal, CLAU } from './repositori.js';
 import { aCopia, deCopia, aCsv } from './copia.js';
 import { estatInicial, reductor, crearAlumne } from '../domini/reductor.js';
+import { escolaInicial, reductorEscola } from '../domini/escola.js';
 
 function memoria() {
   const m = new Map();
@@ -49,12 +50,21 @@ describe('repositori local', () => {
 });
 
 describe('còpia de seguretat', () => {
-  it('exporta i torna a importar el mateix estat', () => {
-    const estat = reductor(estatInicial(), { type: 'ALUMNE_AFEGIR', alumne: crearAlumne('Blai', 1, 'b1') });
-    const text = aCopia(estat, new Date('2026-11-16T10:00:00Z'));
-    const { estat: recuperat, error } = deCopia(text);
+  it('exporta i torna a importar totes les classes', () => {
+    let escola = reductorEscola(escolaInicial(), { type: 'ALUMNE_AFEGIR', alumne: crearAlumne('Blai', 1, 'b1') });
+    escola = reductorEscola(escola, { type: 'AULA_CREAR', id: 'b', nom: '4t' });
+    const text = aCopia(escola, new Date('2026-11-16T10:00:00Z'));
+    const { estat: recuperada, error } = deCopia(text);
     expect(error).toBeNull();
-    expect(recuperat.alumnes).toEqual(estat.alumnes);
+    expect(recuperada).toEqual(escola);
+  });
+
+  it('una còpia antiga, d’una sola classe, es recupera com a primera classe', () => {
+    const vell = reductor(estatInicial(), { type: 'ALUMNE_AFEGIR', alumne: crearAlumne('Blai', 1, 'b1') });
+    const { estat: recuperada, error } = deCopia(aCopia(vell));
+    expect(error).toBeNull();
+    expect(recuperada.aules).toHaveLength(1);
+    expect(recuperada.aules[0].alumnes).toEqual(vell.alumnes);
   });
 
   it('rebutja fitxers que no són una còpia del Trinquet', () => {

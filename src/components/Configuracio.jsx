@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import Finestra from './Finestra.jsx';
 import AvatarPilotari from './AvatarPilotari.jsx';
+import { Pagina, BotoConfirma, camp, campLliure, botoPrimari, botoSecundari } from './comuns.jsx';
 import { useClasse } from '../estat/ClasseContext.jsx';
 import { crearAlumne, nouId } from '../domini/reductor.js';
 import { PREMIS_SUGGERITS, CATEGORIES_TRINQUET } from '../domini/barem.js';
@@ -8,12 +8,13 @@ import { suggerimentsDisponibles } from '../domini/suggeriments.js';
 import { LIMITS_PARTIDA, estatPartida } from '../domini/partida.js';
 import { aCopia, deCopia, baixaFitxer, dataPerAFitxer } from '../dades/copia.js';
 import { hiHaVeu } from '../so/so.js';
+import { plural } from '../domini/text.js';
 
 const PESTANYES = [
   { id: 'alumnes', nom: 'Alumnes' },
   { id: 'categories', nom: 'Categories' },
   { id: 'partida', nom: 'Partida' },
-  { id: 'aula', nom: 'Aula i so' },
+  { id: 'aula', nom: 'Classe i so' },
   { id: 'dades', nom: 'Dades' },
 ];
 
@@ -21,40 +22,6 @@ const PESTANYES = [
 const ICONES = [
   ...new Set([...CATEGORIES_TRINQUET.map((c) => c.icona), '✏️', '🎨', '🔢', '🗣️', '🌱', '⭐', '🏃']),
 ];
-
-const camp = 'min-h-12 w-full rounded-xl border-[3px] border-llosa-200 bg-white px-3 text-lg focus:border-blau-500 focus:outline-none';
-const botoPrimari = 'min-h-12 rounded-xl bg-blau-600 px-5 text-lg font-semibold text-white hover:bg-blau-700 disabled:opacity-40';
-const botoSecundari = 'min-h-12 rounded-xl border-[3px] border-llosa-300 bg-white px-4 text-lg font-semibold text-llosa-700 hover:bg-llosa-100';
-
-/** Botó que demana confirmació amb un segon toc (sense finestres del navegador). */
-function BotoConfirma({ children, pregunta, onConfirma, className = botoSecundari }) {
-  const [segur, setSegur] = useState(false);
-  if (!segur) {
-    return (
-      <button type="button" className={className} onClick={() => setSegur(true)}>
-        {children}
-      </button>
-    );
-  }
-  return (
-    <span className="inline-flex flex-wrap items-center gap-2 rounded-xl bg-ambre-100 px-3 py-1.5">
-      <span className="text-base font-semibold text-ambre-700">{pregunta}</span>
-      <button
-        type="button"
-        className="min-h-11 rounded-lg bg-llosa-900 px-4 text-base font-semibold text-white"
-        onClick={() => {
-          setSegur(false);
-          onConfirma();
-        }}
-      >
-        Sí
-      </button>
-      <button type="button" className="min-h-11 rounded-lg bg-white px-4 text-base font-semibold" onClick={() => setSegur(false)}>
-        No
-      </button>
-    </span>
-  );
-}
 
 function Alumnes() {
   const { estat, dispatch } = useClasse();
@@ -111,7 +78,7 @@ function Alumnes() {
             <li key={a.id} className="flex flex-wrap items-center gap-3 rounded-2xl border-[3px] border-llosa-200 bg-white p-2">
               <AvatarPilotari avatar={a.avatar} mida={40} />
               <input
-                className={`${camp.replace('w-full ', '')} min-w-40 flex-1`}
+                className={`${campLliure} min-w-40 flex-1`}
                 defaultValue={a.nom}
                 aria-label={`Nom de ${a.nom}`}
                 maxLength={24}
@@ -144,7 +111,7 @@ function FilaCategoria({ categoria }) {
     <li className={`rounded-2xl border-[3px] p-3 ${esMillora ? 'border-llosa-200 bg-white' : 'border-groc-200 bg-groc-100/50'}`}>
       <div className="flex flex-wrap items-center gap-3">
         <select
-          className={`${camp.replace('w-full ', '')} w-24 shrink-0 text-2xl`}
+          className={`${campLliure} w-24 shrink-0 text-2xl`}
           value={categoria.icona}
           onChange={(e) => edita({ icona: e.target.value })}
           aria-label={`Icona de ${categoria.nom}`}
@@ -154,7 +121,7 @@ function FilaCategoria({ categoria }) {
           ))}
         </select>
         <input
-          className={`${camp.replace('w-full ', '')} min-w-44 flex-1 font-semibold`}
+          className={`${campLliure} min-w-44 flex-1 font-semibold`}
           defaultValue={categoria.nom}
           aria-label="Nom de la categoria"
           maxLength={30}
@@ -216,7 +183,7 @@ function AfigCategoria({ tipus, etiqueta }) {
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2">
       <select
-        className={`${camp.replace('w-full ', '')} min-w-64 flex-1`}
+        className={`${campLliure} min-w-64 flex-1`}
         value={triada}
         onChange={(e) => setTriada(e.target.value)}
         aria-label={etiqueta}
@@ -364,13 +331,13 @@ function Interruptor({ actiu, onCanvia, titol, ajuda, desactivat = false }) {
 }
 
 function Aula() {
-  const { estat, dispatch, so } = useClasse();
+  const { estat, aules, dispatch, so } = useClasse();
   const veu = hiHaVeu();
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
-          <span className="mb-1 block text-lg font-semibold">Nom de l’aula</span>
+          <span className="mb-1 block text-lg font-semibold">Nom de la classe</span>
           <input className={camp} value={estat.aula.nom} maxLength={30} onChange={(e) => dispatch({ type: 'AULA_EDITAR', canvis: { nom: e.target.value } })} />
         </label>
         <label>
@@ -378,37 +345,59 @@ function Aula() {
           <input className={camp} value={estat.aula.escola} maxLength={40} onChange={(e) => dispatch({ type: 'AULA_EDITAR', canvis: { escola: e.target.value } })} />
         </label>
       </div>
-      <Interruptor
-        actiu={estat.config.so}
-        titol="Sons"
-        ajuda="El colp de la pilota en donar quinzes i les músiques de celebració."
-        onCanvia={(valor) => {
-          dispatch({ type: 'CONFIG', canvis: { so: valor } });
-          if (valor) setTimeout(() => so('quinze'), 50);
-        }}
-      />
-      <Interruptor
-        actiu={estat.config.veu && veu}
-        desactivat={!veu || !estat.config.so}
-        titol="Veu en valencià"
-        ajuda={
-          veu
-            ? 'Diu en veu alta frases com «Quinze!» o «Bona pilota!».'
-            : 'Este aparell no té cap veu en valencià/català instal·lada.'
-        }
-        onCanvia={(valor) => dispatch({ type: 'CONFIG', canvis: { veu: valor } })}
-      />
+
+      <div>
+        <h3 className="mb-2 text-lg font-semibold">So (igual per a totes les classes)</h3>
+        <div className="space-y-3">
+          <Interruptor
+            actiu={estat.config.so}
+            titol="Sons"
+            ajuda="El colp de la pilota en donar quinzes i les músiques de celebració."
+            onCanvia={(valor) => {
+              dispatch({ type: 'CONFIG', canvis: { so: valor } });
+              if (valor) setTimeout(() => so('quinze'), 50);
+            }}
+          />
+          <Interruptor
+            actiu={estat.config.veu && veu}
+            desactivat={!veu || !estat.config.so}
+            titol="Veu en valencià"
+            ajuda={
+              veu
+                ? 'Diu en veu alta frases com «Quinze!» o «Bona pilota!».'
+                : 'Este aparell no té cap veu en valencià/català instal·lada.'
+            }
+            onCanvia={(valor) => dispatch({ type: 'CONFIG', canvis: { veu: valor } })}
+          />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-lg font-semibold">Esborrar la classe</h3>
+        <BotoConfirma
+          disabled={aules.length <= 1}
+          pregunta={`Esborrar «${estat.aula.nom}» amb els seus alumnes, grups i quinzes?`}
+          onConfirma={() => dispatch({ type: 'AULA_ELIMINAR', id: estat.id })}
+        >
+          Esborra esta classe
+        </BotoConfirma>
+        <p className="mt-2 text-base text-llosa-500">
+          {aules.length <= 1
+            ? 'És l’única classe que hi ha: no es pot esborrar. Per a buidar-la, ves a Dades.'
+            : 'Les altres classes no es toquen. Si la vols conservar, baixa abans una còpia des de Dades.'}
+        </p>
+      </div>
     </div>
   );
 }
 
 function Dades() {
-  const { estat, dispatch } = useClasse();
+  const { estat, aules, totesLesAules, dispatch } = useClasse();
   const fitxer = useRef(null);
   const [missatge, setMissatge] = useState(null);
 
   const exporta = () => {
-    baixaFitxer(`trinquet-de-3r-${dataPerAFitxer()}.json`, aCopia(estat), 'application/json');
+    baixaFitxer(`trinquet-de-3r-${dataPerAFitxer()}.json`, aCopia(totesLesAules), 'application/json');
     setMissatge({ to: 'be', text: 'Còpia baixada. Guarda-la en un lloc segur.' });
   };
 
@@ -416,13 +405,18 @@ function Dades() {
     const f = e.target.files?.[0];
     e.target.value = '';
     if (!f) return;
-    const { estat: recuperat, error } = deCopia(await f.text());
+    const { estat: recuperada, error } = deCopia(await f.text());
     if (error) {
       setMissatge({ to: 'error', text: error });
       return;
     }
-    dispatch({ type: 'CARREGAR', estat: recuperat });
-    setMissatge({ to: 'be', text: `Còpia recuperada: ${recuperat.alumnes.length} alumnes.` });
+    dispatch({ type: 'CARREGAR', estat: recuperada });
+    const quantes = recuperada.aules.length;
+    const quants = recuperada.aules.reduce((total, a) => total + a.alumnes.length, 0);
+    setMissatge({
+      to: 'be',
+      text: `Còpia recuperada: ${quantes} ${plural(quantes, 'classe', 'classes')} i ${quants} ${plural(quants, 'alumne/a', 'alumnes')}.`,
+    });
   };
 
   return (
@@ -433,7 +427,7 @@ function Dades() {
       </p>
 
       <div>
-        <h3 className="mb-2 text-lg font-semibold">Còpia de seguretat</h3>
+        <h3 className="mb-2 text-lg font-semibold">Còpia de seguretat de totes les classes</h3>
         <div className="flex flex-wrap gap-3">
           <button type="button" className={botoPrimari} onClick={exporta}>
             Baixa una còpia
@@ -443,6 +437,9 @@ function Dades() {
           </button>
           <input ref={fitxer} type="file" accept="application/json,.json" className="hidden" onChange={importa} aria-label="Fitxer de còpia" />
         </div>
+        <p className="mt-2 text-base text-llosa-500">
+          Recuperar una còpia substitueix totes les classes que hi ha ara en este aparell per les de la còpia.
+        </p>
         {missatge && (
           <p role="status" className={`mt-3 rounded-xl px-4 py-2 text-lg font-semibold ${missatge.to === 'be' ? 'bg-groc-100' : 'bg-ambre-100 text-ambre-700'}`}>
             {missatge.text}
@@ -454,16 +451,20 @@ function Dades() {
         <h3 className="mb-2 text-lg font-semibold">Començar de nou</h3>
         <div className="flex flex-col items-start gap-3">
           <BotoConfirma
-            pregunta="Posar tots els quinzes a zero?"
+            pregunta={`Posar a zero tots els quinzes de «${estat.aula.nom}»?`}
             onConfirma={() => {
               dispatch({ type: 'QUINZES_REINICIAR' });
-              setMissatge({ to: 'be', text: 'Quinzes a zero. Els alumnes i les categories es conserven.' });
+              setMissatge({ to: 'be', text: `Quinzes de «${estat.aula.nom}» a zero. Els alumnes, els grups i les categories es conserven.` });
             }}
           >
-            Posa els quinzes a zero (trimestre nou)
+            Posa a zero els quinzes d’esta classe (trimestre nou)
           </BotoConfirma>
           <BotoConfirma
-            pregunta="Esborrar alumnes, quinzes i configuració?"
+            pregunta={
+              aules.length > 1
+                ? `Esborrar les ${aules.length} classes, amb alumnes, quinzes i configuració?`
+                : 'Esborrar alumnes, quinzes i configuració?'
+            }
             onConfirma={() => {
               dispatch({ type: 'TOT_REINICIAR' });
               setMissatge({ to: 'be', text: 'S’ha esborrat tot.' });
@@ -477,12 +478,14 @@ function Dades() {
   );
 }
 
-export default function Configuracio({ onTanca, inicial = 'alumnes' }) {
+/** Pàgina de configuració de la classe activa. */
+export default function Configuracio({ inicial = 'alumnes' }) {
+  const { estat } = useClasse();
   const [pestanya, setPestanya] = useState(inicial);
   const Contingut = { alumnes: Alumnes, categories: Categories, partida: Partida, aula: Aula, dades: Dades }[pestanya];
 
   return (
-    <Finestra titol="Configuració" onTanca={onTanca} ample="max-w-4xl">
+    <Pagina titol="Configuració" ajuda={`Alumnes, categories i partida de ${estat.aula.nom}.`} ample="max-w-4xl">
       <div role="tablist" aria-label="Apartats de configuració" className="mb-5 flex flex-wrap gap-2">
         {PESTANYES.map((p) => (
           <button
@@ -499,9 +502,10 @@ export default function Configuracio({ onTanca, inicial = 'alumnes' }) {
           </button>
         ))}
       </div>
+      {/* En canviar de classe es tornen a muntar els camps; Dades no, perquè conserve el seu missatge. */}
       <div role="tabpanel">
-        <Contingut />
+        <Contingut key={pestanya === 'dades' ? 'dades' : estat.id} />
       </div>
-    </Finestra>
+    </Pagina>
   );
 }

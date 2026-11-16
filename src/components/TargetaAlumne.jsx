@@ -10,7 +10,7 @@ const TO_ESCLAT = {
 };
 
 /** Targeta d'un/a alumne/a al Trinquet Virtual. */
-export default function TargetaAlumne({ alumne, onToca, esclat, seleccionat = false, triant = false, destacat = false }) {
+export default function TargetaAlumne({ alumne, onToca, esclat, seleccionat = false, triant = false, destacat = false, colorsGrup = [] }) {
   const nivell = nivellDe(alumne.record);
   const blava = alumne.avatar.samarreta === 'blava';
 
@@ -41,10 +41,19 @@ export default function TargetaAlumne({ alumne, onToca, esclat, seleccionat = fa
         </span>
       )}
 
-      {alumne.absent && (
+      {alumne.absent ? (
         <span className="absolute right-2 top-2 z-10 rounded-full bg-llosa-700 px-2.5 py-0.5 text-sm font-semibold text-white">
           Absent
         </span>
+      ) : (
+        colorsGrup.length > 0 && (
+          // Un punt del color de cada grup on està.
+          <span className="absolute right-2.5 top-2.5 z-10 flex gap-1" aria-hidden="true">
+            {colorsGrup.map((color, i) => (
+              <span key={`${color}-${i}`} className="size-3.5 rounded-full border-2 border-white" style={{ background: color }} />
+            ))}
+          </span>
+        )
       )}
 
       <span className={`relative ${esclat ? 'animate-bot' : ''}`} key={`avatar-${esclat?.clau ?? 'quiet'}`}>

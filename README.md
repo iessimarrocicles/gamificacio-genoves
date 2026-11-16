@@ -33,15 +33,20 @@ Encara que estiga en línia, les dades continuen guardant-se només en el navega
 
 ## Com s'usa
 
+El **menú lateral** porta a tot arreu: les classes, les seccions (El trinquet, Grups, Informes i Configuració) i el selector Mestre/a o Alumnat. En pantalles estretes s'obri amb el botó **Menú**.
+
+- **Classes:** se'n poden tindre diverses. Cada una té els seus alumnes, grups, categories, partida i registre. «+ Classe nova» en crea una amb les mateixes categories i la mateixa configuració de partida que la classe on estàs.
+- **Grups:** taules, equips o colles dins d'una classe. Es creen a mà o repartint la classe a l'atzar, i es poden canviar sempre que es vulga: els Quinzes són de cada alumne/a i no es perden. Un/a alumne/a pot estar en més d'un grup.
+- **Donar Quinzes a un grup:** amb el botó del grup que apareix al trinquet, o des de la secció Grups. Només en reben els membres que han vingut.
 - **Donar Quinzes:** toca la targeta d'un/a alumne/a i tria la categoria.
 - **Tota la classe:** premia tots els presents d'un colp.
 - **La rifa de la pilota:** tria un/a alumne/a a l'atzar.
 - **Tria'n uns quants:** marca diverses targetes i premia-les juntes (per exemple, un grup de treball).
 - **Per a millorar:** en tocar «Falta al traure» o «Pilota a la galeria» es tria entre **Avís** (queda anotat, no resta) i **−1 quinze**.
 - **Desfés:** després de cada acció apareix un avís a baix amb el botó per a desfer-la.
-- **Mode Alumnat:** amb el selector de dalt, tocar un nom obri el pilotari de l'alumne/a, on pot veure els seus Quinzes i el seu nivell i canviar-se els complements.
-- **Informes:** resum de la classe o d'un/a alumne/a per setmana, mes o curs. Es poden imprimir o baixar en CSV.
-- **Configuració:** alumnes, categories, partida, sons i dades.
+- **Mode Alumnat:** amb el selector de baix del menú, tocar un nom obri el pilotari de l'alumne/a, on pot veure els seus Quinzes i el seu nivell i canviar-se els complements. En este mode no es pot canviar de classe ni entrar a les altres seccions.
+- **Informes:** resum de la classe, dels grups o d'un/a alumne/a per setmana, mes o curs. Es poden imprimir o baixar en CSV.
+- **Configuració:** alumnes, categories, partida, nom de la classe, sons i dades. Des d'ací també s'esborra una classe.
 
 ## Regles del joc
 
@@ -64,7 +69,9 @@ Això vol dir que:
 - Si s'obri en un altre aparell o navegador, la classe estarà buida.
 - Si s'esborren les dades del navegador, es perd tot.
 
-Per això convé baixar una còpia de tant en tant des de **Configuració → Dades → Baixa una còpia**. Eixe fitxer es pot recuperar en qualsevol aparell.
+Per això convé baixar una còpia de tant en tant des de **Configuració → Dades → Baixa una còpia**. Eixe fitxer porta totes les classes i es pot recuperar en qualsevol aparell. Recuperar una còpia substitueix totes les classes que hi haja en eixe moment.
+
+Les dades guardades amb la versió d'una sola classe (i les còpies antigues) continuen valent: apareixen com a primera classe.
 
 ## Estructura
 
@@ -74,9 +81,11 @@ src/
 │  ├─ barem.js    Categories, nivells, complements i frases
 │  ├─ nivells.js  Nivell, progrés i complements desbloquejats
 │  ├─ partida.js  Marcador de la classe: 15, 30, Val, Joc
-│  ├─ reductor.js Totes les accions: atorgar, avís, −1, desfer, alumnes…
+│  ├─ reductor.js Totes les accions d'una classe: atorgar, avís, −1, desfer, alumnes, grups…
+│  ├─ escola.js   Diverses classes: crear-ne, canviar d'una a altra i esborrar-ne
+│  ├─ grups.js    Colors i noms dels grups i repartiment a l'atzar en equips
 │  ├─ efectes.js  Què s'ha de celebrar després de donar Quinzes
-│  └─ informes.js Resums per alumne/a, grup i període
+│  └─ informes.js Resums per alumne/a, classe, grups i període
 ├─ dades/         Guardar i recuperar (localStorage, còpia, CSV)
 ├─ estat/         Estat compartit de l'app (React Context)
 ├─ so/            Sons (Web Audio) i veu del navegador

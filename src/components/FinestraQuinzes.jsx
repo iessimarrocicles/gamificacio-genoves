@@ -4,19 +4,20 @@ import AvatarPilotari from './AvatarPilotari.jsx';
 import { useClasse } from '../estat/ClasseContext.jsx';
 import { quinzes } from '../domini/text.js';
 
-/** Finestra per a donar quinzes (o un avís, o un −1) a un/a alumne/a, a uns quants o a tota la classe. */
-export default function FinestraQuinzes({ alumneIds, titol, onTanca, onVeuPilotari }) {
+/** Finestra per a donar quinzes (o un avís, o un −1) a un/a alumne/a, a uns quants, a un grup o a tota la classe. */
+export default function FinestraQuinzes({ alumneIds, titol, grupId = null, onTanca, onVeuPilotari }) {
   const { estat, atorgar, dispatch } = useClasse();
   const [millora, setMillora] = useState(null);
 
   const alumnes = estat.alumnes.filter((a) => alumneIds.includes(a.id));
-  const un = alumnes.length === 1 ? alumnes[0] : null;
+  // Un grup es tracta com a grup encara que hui només n'haja vingut un membre.
+  const un = !grupId && alumnes.length === 1 ? alumnes[0] : null;
   const categories = estat.categories.filter((c) => !c.arxivada);
   const positives = categories.filter((c) => c.tipus === 'positiu');
   const deMillora = categories.filter((c) => c.tipus === 'millora');
 
   const dona = (categoriaId, mode = 'quinze') => {
-    atorgar(alumneIds, categoriaId, mode);
+    atorgar(alumneIds, categoriaId, mode, grupId);
     onTanca();
   };
 

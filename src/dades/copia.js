@@ -1,8 +1,8 @@
-import { normalitzaEstat } from '../domini/reductor.js';
+import { normalitzaEscola } from '../domini/escola.js';
 
 const MARCA = 'trinquet-de-3r';
 
-/** Text d'una còpia de seguretat (JSON) de tot l'estat. */
+/** Text d'una còpia de seguretat (JSON) de totes les classes. */
 export function aCopia(estat, ara = new Date()) {
   return JSON.stringify({ app: MARCA, creada: ara.toISOString(), estat }, null, 2);
 }
@@ -18,7 +18,7 @@ export function deCopia(text) {
   if (!dades || dades.app !== MARCA || typeof dades.estat !== 'object') {
     return { estat: null, error: 'Este fitxer no és una còpia d’El Trinquet de 3r.' };
   }
-  return { estat: normalitzaEstat(dades.estat), error: null };
+  return { estat: normalitzaEscola(dades.estat), error: null };
 }
 
 /** CSV amb punt i coma (el que obri bé el full de càlcul en valencià/castellà). */

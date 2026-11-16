@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { reductor, estatInicial, normalitzaEstat, nouId } from '../domini/reductor.js';
+import { reductor, nouId } from '../domini/reductor.js';
+import { reductorEscola, normalitzaEscola, vistaActiva, llistaAules } from '../domini/escola.js';
 import { efectesAtorgar } from '../domini/efectes.js';
 import { FRASES_QUINZE, FRASES_AVIS, FRASES_RESTA, fraseAleatoria } from '../domini/barem.js';
 import { crearRepositoriLocal } from '../dades/repositori.js';
@@ -13,10 +14,10 @@ function hiHaAlgunaCosa(efectes) {
 
 export function ClasseProvider({ children, repositori }) {
   const repo = useMemo(() => repositori ?? crearRepositoriLocal(), [repositori]);
-  const [estat, dispatch] = useReducer(reductor, null, () => {
-    const guardat = repo.carregar();
-    return guardat ? normalitzaEstat(guardat) : estatInicial();
-  });
+  const [escola, dispatch] = useReducer(reductorEscola, null, () => normalitzaEscola(repo.carregar()));
+  // La classe activa, amb la forma que usen totes les pantalles.
+  const estat = useMemo(() => vistaActiva(escola), [escola]);
+  const aules = useMemo(() => llistaAules(escola), [escola]);
   const [errorGuardat, setErrorGuardat] = useState(false);
   const [ultimaAccio, setUltimaAccio] = useState(null); // { lot, text } → per a «Desfés»
   const [esclats, setEsclats] = useState({}); // alumneId → { clau, text, to }
@@ -28,8 +29,15 @@ export function ClasseProvider({ children, repositori }) {
   ultimaRef.current = ultimaAccio;
 
   useEffect(() => {
-    setErrorGuardat(!repo.guardar(estat));
-  }, [estat, repo]);
+    setErrorGuardat(!repo.guardar(escola));
+  }, [escola, repo]);
+
+  // En canviar de classe, s'obliden els avisos i animacions de l'anterior.
+  useEffect(() => {
+    setUltimaAccio(null);
+    setEsclats({});
+    setCelebracio(null);
+  }, [escola.activaId]);
 
   const so = useCallback((nom) => {
     if (estatRef.current.config.so) sons[nom]?.();
@@ -41,7 +49,7 @@ export function ClasseProvider({ children, repositori }) {
 
   /** Dona quinzes (o un avís, o un −1) a un o més alumnes. mode: 'quinze' | 'avis' | 'resta'. */
   const atorgar = useCallback(
-    (alumneIds, categoriaId, mode = 'quinze') => {
+    (alumneIds, categoriaId, mode = 'quinze', grupId = null) => {
       const abans = estatRef.current;
       const categoria = abans.categories.find((c) => c.id === categoriaId);
       if (!categoria) return;
@@ -52,6 +60,7 @@ export function ClasseProvider({ children, repositori }) {
         mode,
         lot: nouId('lot'),
         data: new Date().toISOString(),
+        ...(grupId ? { grupId } : {}),
       };
       const despres = reductor(abans, accio);
       if (despres === abans) return;
@@ -68,7 +77,8 @@ export function ClasseProvider({ children, repositori }) {
       setEsclats((actuals) => ({ ...actuals, ...nous }));
 
       const afectats = abans.alumnes.filter((a) => alumneIds.includes(a.id));
-      const aQui = afectats.length === 1 ? afectats[0].nom : `${afectats.length} alumnes`;
+      const nomGrup = grupId ? abans.grups.find((g) => g.id === grupId)?.nom : null;
+      const aQui = nomGrup ?? (afectats.length === 1 ? afectats[0].nom : `${afectats.length} alumnes`);
       const frase = fraseAleatoria(esPositiva ? FRASES_QUINZE : esAvis ? FRASES_AVIS : FRASES_RESTA);
       setUltimaAccio({
         lot: accio.lot,
@@ -107,6 +117,8 @@ export function ClasseProvider({ children, repositori }) {
   const valor = useMemo(
     () => ({
       estat,
+      aules,
+      totesLesAules: escola,
       dispatch,
       atorgar,
       desfer,
@@ -119,7 +131,7 @@ export function ClasseProvider({ children, repositori }) {
       tancaCelebracio: () => setCelebracio(null),
       errorGuardat,
     }),
-    [estat, atorgar, desfer, so, digues, ultimaAccio, esclats, celebracio, errorGuardat],
+    [estat, aules, escola, atorgar, desfer, so, digues, ultimaAccio, esclats, celebracio, errorGuardat],
   );
 
   return <ClasseContext.Provider value={valor}>{children}</ClasseContext.Provider>;

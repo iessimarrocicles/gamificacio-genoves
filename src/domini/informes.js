@@ -102,3 +102,20 @@ export function evolucioDiaria(estat, dies = 14, ara = new Date(), alumneId = nu
   }
   return resultat;
 }
+
+/** Una fila per grup: membres, quinzes que sumen ara i quinzes guanyats pels seus membres en el període. */
+export function resumGrups(estat, periode = 'tot', ara = new Date()) {
+  const esdeveniments = delPeriode(estat.esdeveniments, periode, ara);
+  return (estat.grups ?? []).map((g) => {
+    const ids = new Set(g.alumneIds);
+    const membres = estat.alumnes.filter((a) => ids.has(a.id));
+    return {
+      id: g.id,
+      nom: g.nom,
+      color: g.color,
+      membres: membres.length,
+      quinzes: membres.reduce((total, a) => total + a.quinzes, 0),
+      guanyats: suma(esdeveniments.filter((ev) => ids.has(ev.alumneId))).guanyats,
+    };
+  });
+}

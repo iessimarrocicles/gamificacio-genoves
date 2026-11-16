@@ -71,18 +71,41 @@ Amb el mode pla es va escriure i aprovar el disseny: enfocaments comparats (Reac
 - **Prompt:** «Crea un repositori en local i un repositori en github». El local ja existia; es va crear `iessimarrocicles/gamificacio-genoves` a GitHub (privat) amb la ferramenta `gh` i es va pujar.
 - **Prompt:** «pots fer-la pública i a Pages per poder-la provar». El repositori passa a públic i s'afig una publicació automàtica amb GitHub Actions: proves, compilació i publicació a https://iessimarrocicles.github.io/gamificacio-genoves/
 
+### 9. Propostes del trinquet i millora amb −1, −2…
+- **Prompt:** «Quan crees coses que sumen quinzes i punts, vull tindre un desplegable amb coses relacionades amb el trinquet igual que les que resten, i les que resten vull tindre l'opció de posar el −1, −2 com tinc en el de sumar».
+- **Resultat:** a Configuració, Categories, un desplegable amb propostes de vocabulari de pilota per a les que sumen i per a les de millora, i el selector − / + també en les de millora.
+
+### 10. Diverses classes, grups i menú lateral
+- **Prompt:** «Vull poder tindre en la UI diferents classes i dins d'una classe fer grups que poden canviar al llarg del temps. […] Si vols fer una UI amb un menú lateral perquè quede més clar ho fas i canvies un poc l'estructura web».
+- **Com es va fer:** primer les regles amb les seues proves (`escola.js` i `grups.js`), després la capa de dades i l'estat, i al final les pantalles. La sessió es va tallar a mitges pel límit d'ús i es va reprendre després amb «Pots continuar»: Claude va llegir el que havia quedat fet i va acabar-ho.
+- **Decisions preses per Claude (no venien al prompt):**
+
+| Decisió | Per què |
+|---|---|
+| Menú lateral fix amb classes, seccions i el selector Mestre/a o Alumnat; en pantalles estretes s'obri amb un botó | Amb diverses classes, la barra de dalt ja no donava per a tot |
+| Informes i Configuració passen de finestra emergent a pàgina | Ara són seccions del menú |
+| Una classe nova copia les categories i la configuració de la partida de la classe on estàs | Per a no haver de tornar a preparar-ho tot |
+| Els Quinzes són sempre de l'alumne/a; els d'un grup són la suma dels dels seus membres d'ara | Així els grups es poden canviar sense perdre res |
+| Un/a alumne/a pot estar en més d'un grup | Taula, equip de projecte i colla de lectura alhora |
+| El so i la veu són comuns a totes les classes | És cosa de l'aparell, no de la classe |
+| Les dades i les còpies antigues, d'una sola classe, es carreguen com a primera classe | Per a no perdre el que ja hi havia guardat |
+| En mode Alumnat no es pot canviar de classe ni entrar a les altres seccions | Perquè l'alumnat no toque res del mestre/a |
+
 ## Canvis respecte al pla
 - **React 19** en lloc de React 18: és la versió estable actual.
 - **Joc de 100 Quinzes** en lloc de 40 (vegeu la taula anterior).
 - Afegit **«Tria'n uns quants»** per a premiar un grup de treball, que no estava al pla.
+- Afegides **diverses classes, grups i menú lateral** (pas 10), que tampoc estaven al pla.
 
 ## Comprovacions fetes
-- 66 proves automàtiques en verd (`npm test`).
+- 111 proves automàtiques en verd (`npm test`).
 - Compilació sense errors (`npm run build`).
-- Recorregut al navegador: classe d'exemple, +2 individual, tota la classe, avís i −1, complement nou, rifa, vista d'alumne, posar-se la faixa, informes, canviar la partida i recarregar la pàgina conservant les dades.
-- Sense desbordament horitzontal ni botons menuts a 768, 1024 i 1920 píxels d'amplada.
+- Recorregut al navegador de la primera versió: classe d'exemple, +2 individual, tota la classe, avís i −1, complement nou, rifa, vista d'alumne, posar-se la faixa, informes, canviar la partida i recarregar la pàgina conservant les dades.
+- Sense desbordament horitzontal ni botons menuts a 768, 1024 i 1920 píxels d'amplada (primera versió).
+- Recorregut al navegador del pas 10, a 1920 píxels: repartir la classe en 4 equips, +2 a un grup des del trinquet, informe per grups, crear una classe, tornar a la primera, mode Alumnat i esborrar la classe nova. A 800 píxels: el menú s'amaga, s'obri amb el botó i la pàgina no es desborda.
 
 ## No comprovat
+- Del pas 10, al navegador: recuperar una còpia amb diverses classes (només amb prova automàtica) i les amplàries de 768 i 1024 píxels.
 - El so i la veu (no es poden escoltar des de les proves).
 - La impressió dels informes en paper.
 - L'ús en una pissarra digital real.
