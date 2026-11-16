@@ -107,7 +107,7 @@ function Alumnes() {
             <li key={a.id} className="flex flex-wrap items-center gap-3 rounded-2xl border-[3px] border-llosa-200 bg-white p-2">
               <AvatarPilotari avatar={a.avatar} mida={40} />
               <input
-                className={`${camp} min-w-40 flex-1`}
+                className={`${camp.replace('w-full ', '')} min-w-40 flex-1`}
                 defaultValue={a.nom}
                 aria-label={`Nom de ${a.nom}`}
                 maxLength={24}
@@ -140,7 +140,7 @@ function FilaCategoria({ categoria }) {
     <li className={`rounded-2xl border-[3px] p-3 ${esMillora ? 'border-llosa-200 bg-white' : 'border-groc-200 bg-groc-100/50'}`}>
       <div className="flex flex-wrap items-center gap-3">
         <select
-          className={`${camp} w-24 text-2xl`}
+          className={`${camp.replace('w-full ', '')} w-24 shrink-0 text-2xl`}
           value={categoria.icona}
           onChange={(e) => edita({ icona: e.target.value })}
           aria-label={`Icona de ${categoria.nom}`}
@@ -150,7 +150,7 @@ function FilaCategoria({ categoria }) {
           ))}
         </select>
         <input
-          className={`${camp} min-w-44 flex-1 font-semibold`}
+          className={`${camp.replace('w-full ', '')} min-w-44 flex-1 font-semibold`}
           defaultValue={categoria.nom}
           aria-label="Nom de la categoria"
           maxLength={30}
