@@ -12,6 +12,7 @@ Registre dels passos, prompts, plugins i decisions, perquè es puga explicar o r
 | Plugin **supabase** | Activat però sense ús: les dades es guarden en local |
 | Plugin **context7** | Activat però pendent d'autoritzar; no s'ha arribat a usar |
 | **Claude in Chrome** (extensió) | Obrir l'app al navegador i provar-la amb clics reals i captures |
+| **GitHub CLI (`gh`) i GitHub Actions** | Crear el repositori i publicar l'app a GitHub Pages |
 | **Mode pla** de Claude Code | Aprovar el disseny abans d'escriure cap línia de codi |
 
 Els quatre plugins estan activats a `.claude/settings.json`.
@@ -65,6 +66,10 @@ Amb el mode pla es va escriure i aprovar el disseny: enfocaments comparats (Reac
 | En premiar tota la classe, les targetes mostraven avatars repetits | Dues peces de la targeta compartien identificador; se'ls va donar un de propi |
 | La celebració no cabia en pantalla quan pujava de nivell tota la classe | Versió compacta amb la llista de noms quan en són més de quatre |
 | Amb 22 alumnes, la partida es guanyava en cinc tocs | El joc passa de 40 a 100 Quinzes per defecte |
+
+### 8. Repositori i publicació
+- **Prompt:** «Crea un repositori en local i un repositori en github». El local ja existia; es va crear `iessimarrocicles/gamificacio-genoves` a GitHub (privat) amb la ferramenta `gh` i es va pujar.
+- **Prompt:** «pots fer-la pública i a Pages per poder-la provar». El repositori passa a públic i s'afig una publicació automàtica amb GitHub Actions: proves, compilació i publicació a https://iessimarrocicles.github.io/gamificacio-genoves/
 
 ## Canvis respecte al pla
 - **React 19** en lloc de React 18: és la versió estable actual.

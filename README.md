@@ -23,6 +23,14 @@ Altres ordres:
 
 La carpeta `dist/` és una web estàtica: es pot copiar a qualsevol servidor o obrir-la amb `npm run preview`.
 
+## Versió en línia
+
+**https://iessimarrocicles.github.io/gamificacio-genoves/**
+
+Cada vegada que es puja un canvi a la branca `main`, GitHub passa les proves, compila l'app i la publica a GitHub Pages (`.github/workflows/pages.yml`). Si alguna prova falla, no es publica.
+
+Encara que estiga en línia, les dades continuen guardant-se només en el navegador de qui l'obri.
+
 ## Com s'usa
 
 - **Donar Quinzes:** toca la targeta d'un/a alumne/a i tria la categoria.
