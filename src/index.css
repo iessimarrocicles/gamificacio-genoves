@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Alfa Slab One", "Rockwell", "Georgia", serif;
+  --font-sans: "Lexend Variable", "Lexend", system-ui, "Segoe UI", sans-serif;
+
+  /* Calç: la paret blanca del trinquet */
+  --color-calc: #f6f7f2;
+  --color-calc-fosc: #e9ebe2;
+
+  /* Llosa: el pis de pedra */
+  --color-llosa-900: #1e2733;
+  --color-llosa-700: #3a4656;
+  --color-llosa-500: #667283;
+  --color-llosa-300: #b4bcc7;
+  --color-llosa-200: #d5dae0;
+  --color-llosa-100: #e9ecef;
+
+  /* Blaus i rojos: els dos equips */
+  --color-blau-800: #123267;
+  --color-blau-700: #173f86;
+  --color-blau-600: #1f4fa3;
+  --color-blau-500: #2f66c8;
+  --color-blau-200: #b9cdf0;
+  --color-blau-100: #dbe6f8;
+  --color-blau-50: #eef3fc;
+  --color-roig-700: #a81b2d;
+  --color-roig-600: #d7263d;
+  --color-roig-200: #f5b9c1;
+  --color-roig-100: #fbdfe3;
+
+  /* Groc de cartell: els Quinzes */
+  --color-groc-600: #b77f00;
+  --color-groc-400: #f9c22e;
+  --color-groc-200: #fde49a;
+  --color-groc-100: #fef3cf;
+
+  /* Ambre suau: el barem de millora, sense roig agressiu */
+  --color-ambre-700: #8a5a12;
+  --color-ambre-100: #f7ead3;
+
+  --animate-puja: puja 1.4s ease-out forwards;
+  --animate-bot: bot 0.6s ease-out;
+  --animate-apareix: apareix 0.25s ease-out;
+  --animate-cau: cau linear forwards;
+  --animate-batec: batec 1.2s ease-in-out infinite;
+
+  @keyframes puja {
+    0% { transform: translateY(0) scale(0.6); opacity: 0; }
+    15% { transform: translateY(-8px) scale(1.15); opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translateY(-70px) scale(1); opacity: 0; }
+  }
+  @keyframes bot {
+    0% { transform: translateY(0); }
+    30% { transform: translateY(-14px); }
+    55% { transform: translateY(0); }
+    75% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes apareix {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes cau {
+    from { transform: translateY(-10vh) rotate(0deg); }
+    to { transform: translateY(110vh) rotate(540deg); }
+  }
+  @keyframes batec {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+}
+
+html {
+  background: var(--color-calc);
+  color: var(--color-llosa-900);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-groc-400);
+  outline-offset: 2px;
+}
+
+/* Números de marcador: sempre de la mateixa amplària perquè no ballen */
+.xifres {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .per-imprimir,
+  .per-imprimir * {
+    visibility: visible;
+  }
+  .per-imprimir {
+    position: absolute;
+    inset: 0;
+    overflow: visible !important;
+    max-height: none !important;
+    padding: 0 !important;
+  }
+  .no-imprimir {
+    display: none !important;
+  }
+}

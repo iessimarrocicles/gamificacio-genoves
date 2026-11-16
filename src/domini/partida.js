@@ -2,7 +2,7 @@
 // Com en la pilota, cada joc es canta 15 · 30 · Val · Joc.
 
 export const PARTIDA_INICIAL = {
-  quinzesPerJoc: 40,
+  quinzesPerJoc: 100,
   jocsObjectiu: 5,
   premi: '10 minuts més de pati',
   acumulat: 0,
@@ -10,7 +10,7 @@ export const PARTIDA_INICIAL = {
 };
 
 export const LIMITS_PARTIDA = {
-  quinzesPerJoc: { min: 4, max: 400 },
+  quinzesPerJoc: { min: 4, max: 1000 },
   jocsObjectiu: { min: 1, max: 12 },
 };
 

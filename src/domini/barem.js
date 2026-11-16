@@ -29,7 +29,7 @@ export const CATEGORIES_INICIALS = [
   {
     id: 'treball-equip',
     nom: 'Treball d’equip',
-    icona: '🫱🏽‍🫲🏼',
+    icona: '👥',
     valor: 2,
     tipus: 'positiu',
     descripcio: 'Col·laborar correctament en grup.',

@@ -29,7 +29,7 @@ El projecte es fa **des de zero** a `c:\proyectos-ia\apps\gamificacio-genoves` (
 - **Quinzes** = saldo actual. **Rècord** = màxim històric. El **nivell i els complements depenen del rècord**, així un −1 mai fa perdre nivell ni complements. Els Quinzes no baixen de 0.
 - **Nivells** (rècord mínim): Aficionat/da 0 · Marxador/a 10 · Punter/a 25 · Mitger/a 45 · Rest 70 · Campió/ona del Genovés 100.
 - **Complements desbloquejables**: didals (0), faixa (5), mocador al coll (15), guant (30), espardenyes de careta (50), faixa daurada (75), trofeu (100). Samarreta blava o roja, pell i cabell sempre lliures.
-- **Partida de la classe**: cada Quinze positiu de qualsevol alumne/a suma a la partida. Un joc es canta 15 → 30 → Val → Joc (per defecte 40 Quinzes de classe per joc). Objectiu per defecte: 5 jocs → premi configurable («10 minuts més de pati»). Els −1 no resten a la partida.
+- **Partida de la classe**: cada Quinze positiu de qualsevol alumne/a suma a la partida. Un joc es canta 15 → 30 → Val → Joc (per defecte 100 Quinzes de classe per joc). Objectiu per defecte: 5 jocs → premi configurable («10 minuts més de pati»). Els −1 no resten a la partida.
 - **Avís**: queda al registre per als informes; so suau i frase en positiu, sense res de roig agressiu.
 - **Desfés**: l'última acció (individual o de tota la classe) es pot desfer des d'un avís a peu de pantalla.
 - **Absents**: es poden marcar; queden fora de «Tota la classe» i de la rifa.
